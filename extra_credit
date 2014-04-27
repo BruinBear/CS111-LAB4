@@ -1,0 +1,2 @@
+we found that in many cases the other client can write to uploading client malicious messages through osp2p_writef.
+WE CHECKED before writef for some patterns such as 'exit' is not allowed. THis might crush the clients running on other devices.

@@ -1,0 +1,118 @@
+# Fill in your name, student ID, and email address in this file.
+# If you are working in a team, fill out the information for both team 
+# members.
+
+# SUBMIT THE LAB ONLY ONCE (from only one partner). This file will be
+# automatically parsed in order to give both team members credit for the
+# lab.
+
+# You need to fill in the EXERCISE sections describing your solutions
+# for Tasks 1, 2, and 3, as well as write the corresponding code.
+# If you did one or more extra credit problems, indicate which one in the
+# appropriate section below (remove the # sign first). If you have any other
+# information you'd like us to know, please add it at the end of the file.
+
+# Partner 1
+Name: jingyu Liu
+Student ID: 404193267
+Email: ljy1681@gmail.com
+
+# Partner 2 (if you're working in a team)
+# Name: zhinan guan
+# Student ID: 004118232
+# Email: zhinanguan@gmail.com
+====================================================================================
+# EXERCISE 1: What method you used to make your peer download and upload
+#    files in parallel?  (~1-3 sentences)
+-----------------------------------------------------------------------------------
+1.
+In the main function we changed both downloading and uploading tasks into being executed in parallel.
+
+each loop will create a child process that does the downloading or uploading while the parent goes on
+without waiting for the child proc to finish and starts the next task.
+-----------------------------------------------------------------------------------
+# EXERCISE 2A: What conditions did you find and fix that would have
+#    triggered a buffer overrun bug?  (~1-3 sentences each)
+
+If we upload a file with long name or request to download a file with long name that exceeds the buffer size, buffer overrun may happen.
+
+In the directory copy section, the original code used strcpy doesn't proctect against buffer overrun.
+We changed it to strncpy with the FILENAMESIZ as upperbound for dir size, which protects against buffer overrun.
+====================================================================================
+# EXERCISE 2B: What other robustness problems did you fix?  (~1-3 sentences
+#    each)
+1.
+we solved issues with gainning root, home ,and previous dir access mode. 
+Directories like those will not be allowed, and an error indicating denial of directory is given.
+We achieved this by filtering patterns like '~/' '/' '../' 
+-----------------------------------------------------------------------------------
+2.
+we added limit to maximum file size to be downloaded to be 10000B by checking total_written, everytime we write something to disk.
+
+example:
+jingyu@wzr:~/lab4$ ./osppeer -dtest2 -t11111 likethislab
+* Tracker's greeting:
+200-Welcome to the OSP2P tracker!
+200-You will be timed out after 600 seconds of inactivity.
+200 Try 'HELP' to get a list of commands.
+* Listening on port 11114
+* Tracker's response to our IP address registration:
+200 Address registered.
+* Registering our files with tracker
+* Finding peers for 'likethislab'
+* Connecting to 128.97.224.226:11113 to download 'likethislab'
+* Saving result to 'likethislab~1~'
+* Jingyu: File exceeds maximum file size: File exists
+* No peers are willing to serve 'likethislab'
+
+the bad peer is trying to write a huge file to me. which I stopped by checking size written and printed error message and stopped downloading.
+---------------------------------------------------------------------------------
+3.
+A popular tracker returned a response larger than TASKBUFSIZ.
+We enlarged TASKBUFSIZ 4 times.
+=================================================================================
+# EXERCISE 3: Describe the attacks you implemented for "evil mode".  Why
+#    are they attacks?  (~3-10 sentences each)
+---------------------------------------------------------------------------------
+1.
+we implemented a evil uploading mode which for each upload it will bogusly upload useless informationwithout stopping and fill the downloaders disk with useless information until their disks are full.
+
+example:
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+* Upload of likethislab complete
+.......
+in a while loop we keep uploading information into the file likethislab in the requested dir of the downloader and will fill up the disk of any downloader.
+---------------------------------------------------------------------------------
+2.
+we also exploited an buffer overrun attack in sending request to other peers that has a very long name, which is likely to overrun machine without clients without buffer protections and likely to corrupt the clients.
+
+example:
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+Segmentation fault (core dumped)
+=================================================================================
+# Extra credit problems
+#Extra credit problem: 
+MD5 CHECKSUM FOR DOWNLOADING
+After download is completed, we check to see if the local file and tracker served file has the same md5 and if now we go back to try again to download the same file from another peer. The implementation involving using RPC to get MD5 for remote file that was supposedly downloaded.
+
+# Add any other information you'd like us to know below this line.
